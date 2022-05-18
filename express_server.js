@@ -1,8 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const app = express();
-const PORT = 8080;
+const bcrypt = require('bcryptjs');
 
 const { urlDatabase, users } = require("./data/database");
 const {
@@ -14,8 +13,10 @@ const {
   checkUserOwnUrl
 } = require("./helper/helper");
 const { auth } = require("./middleware/auth");
-const { send } = require("express/lib/response");
-const res = require("express/lib/response");
+
+const app = express();
+const PORT = 8080;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -113,8 +114,12 @@ app.post("/register", (req, res) => {
   if (userObj) {
     return res.status(400).send("Email already exists");
   }
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const id = generateShortURL(6);
-  users[id] = { id, email, password };
+  users[id] = { 
+    id, 
+    email, 
+    password: hashedPassword };
   res.cookie("user_id", id);
   res.redirect("/urls");
 });
@@ -126,7 +131,8 @@ app.post("/login", (req, res) => {
   }
   const { email, password } = req.body;
   const userObj = checkEmail(users, email);
-  if (userObj && userObj.password === password) {
+  const hashedPassword = userObj.password;
+  if (userObj && bcrypt.compareSync(password, hashedPassword)) {
     res.cookie("user_id", userObj.id);
     return res.redirect("/urls");
   }
