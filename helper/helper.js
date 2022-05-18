@@ -6,5 +6,16 @@ function generateShortURL(length) {
   }
   return result;
 }
-
-module.exports = {generateShortURL};
+function checkUserID(users, id) {
+  return Object.keys(users).indexOf(id) > -1;
+}
+function checkEmail(users, email) {
+  for(let key of Object.keys(users)) {
+    let userObj = users[key];
+    if (userObj.email === email) {
+      return userObj;
+    }
+  }
+  return null;
+}
+module.exports = {generateShortURL, checkEmail, checkUserID};

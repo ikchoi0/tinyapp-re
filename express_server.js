@@ -5,7 +5,7 @@ const app = express();
 const PORT = 8080;
 
 const { urlDatabase, users } = require("./data/database");
-const { generateShortURL } = require("./helper/helper");
+const { generateShortURL, checkEmail, checkUserID } = require("./helper/helper");
 const { send } = require("express/lib/response");
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(cookieParser());
@@ -75,27 +75,34 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`);
 });
 
-function checkEmail(users, email) {
-  for(let key of Object.keys(users)) {
-    let userObj = users[key];
-    if (userObj.email === email) {
-      return userObj;
-    }
-    return null;
-  }
-}
-
 app.post("/register", (req, res) => {
-  console.log(req.body.email);
   const {email, password} = req.body;
+  if (!email || !password) {
+    return res.status(400).send("Missing email/password");
+  }
   const userObj = checkEmail(users, email);
   if (userObj) {
-    return res.status("400").send("Email already exists");
+    return res.status(400).send("Email already exists");
   }
-  const generatedID = generateShortURL(6);
-  users[generatedID] = { generatedID, email, password };
-  res.cookie("user_id", generatedID);
+  const id = generateShortURL(6);
+  users[id] = { id, email, password };
+  res.cookie("user_id", id);
   res.redirect('/urls');
+});
+
+app.post("/login", (req, res) => {
+  console.log(users);
+  const userId = req.cookies["user_id"];
+  if (checkUserID(users, userId)) {
+    return res.redirect("/urls");
+  }
+  const { email, password } = req.body; 
+  const userObj = checkEmail(users, email);
+  if (userObj && userObj.password === password) {
+    res.cookie("user_id", userObj.id);
+    res.redirect("/urls");
+  }
+  res.status(403).send("wrong ID/password combination");
 });
 
 app.post("/logout", (req, res) => {
