@@ -16,6 +16,17 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <% if (Object.keys(user).length === 0) { %>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
+        <% } else { %>
+          <form action="/logout" method="POST" class="form-inline">
+            <div class="form-group mb-2">
+              <input type="text" readonly class="form-control-plaintext" id="staticEmail2" value="<%= user.email %>">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Logout</button>
+          </form>
+        <% } %>
         </form>
       </div>
     </div>

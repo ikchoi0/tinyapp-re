@@ -17,39 +17,28 @@
     <title>TinyApp</title>
   </head>
   <body>
-    <%- include('partials/_header', { user: user }) %>
+    <%- include('partials/_header') %>
     <main style="margin: 1em">
-      <h3>My URLs</h3>
-
-      <table class="table">
+      <h3>Registration</h3>
+      <form action="/register" method="POST">
+        <div class="form-group row">
+          <label for="email" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-10">
+            <input class="form-control" name="email" placeholder="Email" value="ikchoi0@gmail.com">
+          </div>
         </div>
-        <thead>
-          <tr>
-            <th scope="col">Short URL</th>
-            <th scope="col">Long URL</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for(let url of Object.keys(urls)) { %>
-          <tr>
-            <td><a href="urls/<%= url %>"><%= url %></a></td>
-            <td><%= urls[url] %></td>
-            <td>
-              <form method="GET" action="/urls/<%= url %>/edit">
-                <button class="btn btn-outline-primary">Edit</button>
-              </form>
-            </td>
-            <td>
-              <form method="POST" action="/urls/<%= url %>/delete">
-                <button class="btn btn-outline-danger">Delete</button>
-              </form>
-            </td>
-          </tr>
-          <% } %>
-        </tbody>
-      </table>
+        <div class="form-group row">
+          <label for="password" class="col-sm-2 col-form-label">Password</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" name="password" placeholder="Password">
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </div>
+      </form>
     </main>
     <!-- Bootstrap JS -->
     <script
