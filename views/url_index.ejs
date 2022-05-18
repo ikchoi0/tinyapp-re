@@ -20,8 +20,12 @@
     <%- include('partials/_header', { user: user }) %>
     <main style="margin: 1em">
       <h3>My URLs</h3>
-
-      <table class="table">
+      <% if (Object.keys(user).length === 0) { %>
+        <div class="alert alert-danger" role="alert">
+          Please login to see your URL list
+        </div>
+      <% } else { %>
+        <table class="table">
         </div>
         <thead>
           <tr>
@@ -49,7 +53,8 @@
           </tr>
           <% } %>
         </tbody>
-      </table>
+        </table>
+      <% } %>
     </main>
     <!-- Bootstrap JS -->
     <script

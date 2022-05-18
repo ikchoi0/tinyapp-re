@@ -7,6 +7,7 @@ const PORT = 8080;
 const { urlDatabase, users } = require("./data/database");
 const { generateShortURL, checkEmail, checkUserID, loggedIn } = require("./helper/helper");
 const { send } = require("express/lib/response");
+const res = require("express/lib/response");
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -39,12 +40,30 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("url_show", templateVars);
 });
 
+function filteredUrlDatabase (urlDatabase, userID) {
+  const filtered = {};
+  for (let key of Object.keys(urlDatabase)) {
+    if (urlDatabase[key].userID === userID) {
+      filtered[key] = urlDatabase[key];
+    }
+  }
+  return filtered;
+}
+
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]] || {};
-  const templateVars = {urls: urlDatabase, user: user};
+  const userID = req.cookies["user_id"];
+  const user = users[userID] || {};
+  const filtered = filteredUrlDatabase(urlDatabase, userID);
+  const templateVars = {urls: filtered, user: user};
   res.render("url_index", templateVars);
 });
-
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL] === undefined) {
+    return res.send("Error: shortURL does not exist");
+  };
+  res.redirect(urlDatabase[shortURL].longURL);
+});
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]] || {};
   const templateVars = {user};
