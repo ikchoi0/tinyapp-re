@@ -1,4 +1,4 @@
-const { loggedIn, checkUserOwnUrl } = require('../helper/helper');
+const { loggedIn, checkUserOwnUrl } = require('../helpers');
 const { users, urlDatabase } = require('../data/database');
  
 function auth (req, res, next) {

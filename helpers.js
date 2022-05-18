@@ -9,7 +9,7 @@ function generateShortURL(length) {
 function checkUserID(users, id) {
   return Object.keys(users).indexOf(id) > -1;
 }
-function checkEmail(users, email) {
+function getUserByEmail(users, email) {
   for (let key of Object.keys(users)) {
     let userObj = users[key];
     if (userObj.email === email) {
@@ -39,4 +39,4 @@ function checkUserOwnUrl(urlObj, userID) {
   return false;
 }
 
-module.exports = { generateShortURL, checkEmail, checkUserID, loggedIn, filteredUrlDatabase, checkUserOwnUrl};
+module.exports = { generateShortURL, getUserByEmail, checkUserID, loggedIn, filteredUrlDatabase, checkUserOwnUrl};

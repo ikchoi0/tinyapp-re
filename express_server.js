@@ -6,12 +6,12 @@ const bcrypt = require("bcryptjs");
 const { urlDatabase, users } = require("./data/database");
 const {
   generateShortURL,
-  checkEmail,
+  getUserByEmail,
   checkUserID,
   loggedIn,
   filteredUrlDatabase,
   checkUserOwnUrl,
-} = require("./helper/helper");
+} = require("./helpers");
 const { auth } = require("./middleware/auth");
 
 const app = express();
@@ -19,13 +19,15 @@ const PORT = 8080;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-app.use(cookieSession({
-  name: 'session',
-  keys: ["hellohellohello"],
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["hellohellohello"],
 
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
 
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id] || {};
@@ -61,7 +63,6 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  //const userID = req.cookies["user_id"];
   const user = users[userID] || {};
   const filtered = filteredUrlDatabase(urlDatabase, userID);
   const templateVars = { urls: filtered, user: user };
@@ -117,7 +118,7 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send("Missing email/password");
   }
-  const userObj = checkEmail(users, email);
+  const userObj = getUserByEmail(users, email);
   if (userObj) {
     return res.status(400).send("Email already exists");
   }
@@ -129,8 +130,6 @@ app.post("/register", (req, res) => {
     password: hashedPassword,
   };
   req.session.user_id = id;
-
-  //res.cookie("user_id", id);
   res.redirect("/urls");
 });
 
@@ -138,22 +137,25 @@ app.post("/login", (req, res) => {
   const userId = req.session.user_id;
   if (checkUserID(users, userId)) {
     return res.redirect("/urls");
-  }
+  }  
   const { email, password } = req.body;
-  const userObj = checkEmail(users, email);
+  if (!email || !password) {
+    return res.status(400).send("Missing email/password");
+  }
+  const userObj = getUserByEmail(users, email);
+  if (!userObj) {
+    return res.status(400).send("Email does not exist");
+  }
   const hashedPassword = userObj.password;
   if (userObj && bcrypt.compareSync(password, hashedPassword)) {
     req.session.user_id = userObj.id;
-    //res.cookie("user_id", userObj.id);
     return res.redirect("/urls");
   }
   res.status(403).send("wrong ID/password combination");
 });
 
 app.post("/logout", (req, res) => {
-  //res.clearCookie("user_id");
   req.session = null;
-  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 app.listen(PORT, () => {
