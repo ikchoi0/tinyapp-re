@@ -13,7 +13,7 @@ const {
   filteredUrlDatabase,
   checkUserOwnUrl
 } = require("./helper/helper");
-
+const { auth } = require("./middleware/auth");
 const { send } = require("express/lib/response");
 const res = require("express/lib/response");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,11 +40,8 @@ app.get("/urls/:shortURL/edit", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.cookies["user_id"];
   const shortURL = req.params.shortURL;
-  if (
-    !loggedIn(users, userID) ||
-    !checkUserOwnUrl(urlDatabase[shortURL], userID)
-  ) {
-    return res.status(403).send("You do not have permission!");
+  if (urlDatabase[shortURL] === undefined) {
+    return res.status(404).send("Page not found");
   }
   const user = users[userID] || {};
   const templateVars = {
@@ -97,29 +94,13 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/urls/:shortURL/edit", (req, res) => {
-  const userID = req.cookies["user_id"];
-  const shortURL = req.params.shortURL;
-  if (
-    !loggedIn(users, userID) ||
-    !checkUserOwnUrl(urlDatabase[shortURL], userID)
-  ) {
-    return res.status(403).send("You do not have permission!");
-  }
-  urlDatabase[shortURL].longURL = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`);
+app.post("/urls/:shortURL/edit", auth, (req, res) => {
+  urlDatabase[req.shortURL].longURL = req.body.longURL;
+  res.redirect(`/urls/${req.shortURL}`);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  const userID = req.cookies["user_id"];
-  const shortURL = req.params.shortURL;
-  if (
-    !loggedIn(users, userID) ||
-    !checkUserOwnUrl(urlDatabase[shortURL], userID)
-  ) {
-    return res.status(403).send("You do not have permission!");
-  }
-  delete urlDatabase[shortURL];
+app.post("/urls/:shortURL/delete", auth, (req, res) => {
+  delete urlDatabase[req.shortURL];
   res.redirect(`/urls`);
 });
 
