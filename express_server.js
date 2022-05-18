@@ -5,7 +5,7 @@ const app = express();
 const PORT = 8080;
 
 const { urlDatabase, users } = require("./data/database");
-const { generateShortURL, checkEmail, checkUserID } = require("./helper/helper");
+const { generateShortURL, checkEmail, checkUserID, loggedIn } = require("./helper/helper");
 const { send } = require("express/lib/response");
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(cookieParser());
@@ -22,7 +22,7 @@ app.get("/urls/:shortURL/edit", (req, res) => {
   const shortURL = req.params.shortURL;
   const templateVars = {
     shortURL: shortURL,
-    longURL: urlDatabase[shortURL],
+    longURL: urlDatabase[shortURL].longURL,
     user: user
   };
   res.render("url_edit", templateVars);
@@ -33,7 +33,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const templateVars = {
     shortURL: shortURL,
-    longURL: urlDatabase[shortURL],
+    longURL: urlDatabase[shortURL].longURL,
     user: user
   };
   res.render("url_show", templateVars);
@@ -57,15 +57,24 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
-app.post("/urls/new", (req, res) => {
+app.post("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
+  if (!loggedIn(users, userID)){
+    return res.redirect("/login");
+  }
+  const longURL = req.body.longURL;
   const length = 6;
-  urlDatabase[generateShortURL(length)] = req.body.longURL;
+  const generatedID = generateShortURL(length);
+  urlDatabase[generatedID] = {
+    longURL: longURL,
+    userID: generatedID,
+  };
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -91,7 +100,6 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  console.log(users);
   const userId = req.cookies["user_id"];
   if (checkUserID(users, userId)) {
     return res.redirect("/urls");
@@ -100,7 +108,7 @@ app.post("/login", (req, res) => {
   const userObj = checkEmail(users, email);
   if (userObj && userObj.password === password) {
     res.cookie("user_id", userObj.id);
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
   res.status(403).send("wrong ID/password combination");
 });

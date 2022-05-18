@@ -1,8 +1,3 @@
-const urlDatabase = {
-  "abc": "www.google.com",
-  "def": "www.amazon.com"
-};
-
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
@@ -21,5 +16,16 @@ const users = {
   }
 }
 
-module.exports = {urlDatabase, users};
+const urlDatabase = {
+  b6UTxQ: {
+        longURL: "https://www.tsn.ca",
+        userID: "aJ48lW"
+    },
+    i3BoGr: {
+        longURL: "https://www.google.ca",
+        userID: "aJ48lW"
+    }
+};
+
+module.exports = {urlDatabase, users };
 

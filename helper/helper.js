@@ -7,7 +7,8 @@ function generateShortURL(length) {
   return result;
 }
 function checkUserID(users, id) {
-  return Object.keys(users).indexOf(id) > -1;
+  console.log((Object.keys(users).indexOf(id) > -1));
+  return (Object.keys(users).indexOf(id) > -1);
 }
 function checkEmail(users, email) {
   for(let key of Object.keys(users)) {
@@ -18,4 +19,7 @@ function checkEmail(users, email) {
   }
   return null;
 }
-module.exports = {generateShortURL, checkEmail, checkUserID};
+function loggedIn (users, userID) {
+  return userID && checkUserID(users, userID);
+}
+module.exports = {generateShortURL, checkEmail, checkUserID, loggedIn};
