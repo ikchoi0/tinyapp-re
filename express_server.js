@@ -13,6 +13,7 @@ const {
   filteredUrlDatabase,
   checkUserOwnUrl
 } = require("./helper/helper");
+
 const { send } = require("express/lib/response");
 const res = require("express/lib/response");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -68,6 +69,7 @@ app.get("/u/:shortURL", (req, res) => {
   }
   res.redirect(urlDatabase[shortURL].longURL);
 });
+
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]] || {};
   const templateVars = { user };
@@ -90,7 +92,7 @@ app.post("/urls", (req, res) => {
   const generatedID = generateShortURL(length);
   urlDatabase[generatedID] = {
     longURL: longURL,
-    userID: generatedID,
+    userID: userID,
   };
   res.redirect("/urls");
 });

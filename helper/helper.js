@@ -7,7 +7,6 @@ function generateShortURL(length) {
   return result;
 }
 function checkUserID(users, id) {
-  console.log(Object.keys(users).indexOf(id) > -1);
   return Object.keys(users).indexOf(id) > -1;
 }
 function checkEmail(users, email) {
