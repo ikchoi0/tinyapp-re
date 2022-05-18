@@ -23,11 +23,11 @@ const urlDatabase = {
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "1231245s",
-  },
-  i12321: {
-    longURL: "https://www.cnn.ca",
     userID: "aJ48lW",
+  },
+  sgq3y6: {
+    longURL: "https://www.cnn.ca",
+    userID: "1231245s",
   },
 };
 
