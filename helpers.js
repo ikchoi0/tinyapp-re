@@ -21,7 +21,6 @@ function getUserByEmail(email, users) {
 function loggedIn(users, userID) {
   return userID && checkUserID(users, userID);
 }
-
 function filteredUrlDatabase(urlDatabase, userID) {
   const filtered = {};
   for (let key of Object.keys(urlDatabase)) {
