@@ -1,3 +1,5 @@
+const { users, urlDatabase } = require("./data/database");
+
 function generateShortURL(length) {
   let str = "01234567890abcdefghijklmnopqrstuvwxyz";
   let result = "";
@@ -37,6 +39,21 @@ function checkUserOwnUrl(urlObj, userID) {
   }
   return false;
 }
+function validURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+function checkValidURL(str) {
+  if (!validURL(str)) {
+    return { error: "longURL is not in valid format. Please edit your longURL", data: null };
+  }
+  return { error: null, data: null };
+}
 
 module.exports = {
   generateShortURL,
@@ -45,4 +62,5 @@ module.exports = {
   loggedIn,
   filteredUrlDatabase,
   checkUserOwnUrl,
+  checkValidURL
 };

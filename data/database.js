@@ -12,7 +12,7 @@ const users = {
   "1231245s": {
     id: "1231245s",
     email: "ikchoi0@gmail.com",
-    password: "11",
+    password: "$2a$10$0EmYl27/9Fkce3l2DlK9EOmj3mccLMDKsg5nql86ifibW1KacsoIS",
   },
 };
 
@@ -27,6 +27,10 @@ const urlDatabase = {
   },
   sgq3y6: {
     longURL: "https://www.cnn.ca",
+    userID: "1231245s",
+  },
+  a123213: {
+    longURL: "httwa",
     userID: "1231245s",
   },
 };
