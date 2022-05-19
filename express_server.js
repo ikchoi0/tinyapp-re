@@ -128,16 +128,9 @@ app.post(
   }
 );
 
-app.post("/login", redirectIfLoggedIn, (req, res) => {
+app.post("/login", redirectIfLoggedIn, checkMissingInputs, (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID] || {};
-
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res
-      .status(403)
-      .render("error", { user, error: "Missing ID/Password" });
-  }
   const userObj = getUserByEmail(email, users);
   if (!userObj || !bcrypt.compareSync(password, userObj.password)) {
     return res
@@ -147,10 +140,12 @@ app.post("/login", redirectIfLoggedIn, (req, res) => {
   req.session.user_id = userObj.id;
   res.redirect("/urls");
 });
+
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
 });
+
 app.listen(PORT, () => {
   console.log("Server listening on port:", PORT);
 });
