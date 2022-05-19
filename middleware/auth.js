@@ -31,4 +31,4 @@ function checkPermission(req, res, next) {
   next();
 }
 
-module.exports = { auth };
+module.exports = { auth, checkLogIn, checkPermission};

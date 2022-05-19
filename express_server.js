@@ -12,7 +12,7 @@ const {
   filteredUrlDatabase,
   checkUserOwnUrl,
 } = require("./helpers");
-const { auth } = require("./middleware/auth");
+const { auth, checkLogIn, checkPermission } = require("./middleware/auth");
 
 const app = express();
 const PORT = 8080;
@@ -24,7 +24,6 @@ app.use(
     name: "session",
     keys: ["hellohellohello"],
 
-    // Cookie Options
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
@@ -119,12 +118,12 @@ app.post("/urls", (req, res) => {
   };
   res.redirect(`/urls/${generatedID}`);
 });
-app.post("/urls/:shortURL", auth, (req, res) => {
+app.post("/urls/:shortURL", checkLogIn, checkPermission, (req, res) => {
   urlDatabase[req.shortURL].longURL = req.body.longURL;
   res.redirect(`/urls`);
 });
 
-app.post("/urls/:shortURL/delete", auth, (req, res) => {
+app.post("/urls/:shortURL/delete", checkLogIn, checkPermission, (req, res) => {
   delete urlDatabase[req.shortURL];
   res.redirect(`/urls`);
 });
@@ -139,16 +138,14 @@ app.post("/register", (req, res) => {
   if (userObj) {
     res.status(400).render("error", { user, error: "Email already exists" });
   }
-  const salt = bcrypt.genSaltSync(10);
 
-  const hashedPassword = bcrypt.hashSync(password, salt);
+  const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   const id = generateShortURL(6);
   users[id] = {
     id,
     email,
     password: hashedPassword,
   };
-  console.log(users);
   req.session.user_id = id;
   res.redirect("/urls");
 });
