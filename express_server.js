@@ -7,10 +7,7 @@ const { urlDatabase, users } = require("./data/database");
 const {
   generateShortURL,
   getUserByEmail,
-  checkUserID,
-  loggedIn,
   filteredUrlDatabase,
-  checkUserOwnUrl,
   checkValidURL,
 } = require("./helpers");
 const {
@@ -33,7 +30,6 @@ app.use(
   cookieSession({
     name: "session",
     keys: ["hellohellohello"],
-
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
@@ -131,8 +127,8 @@ app.post(
 app.post("/login", redirectIfLoggedIn, checkMissingInputs, (req, res) => {
   const userID = req.session.user_id;
   const user = users[userID] || {};
-  const userObj = getUserByEmail(email, users);
-  if (!userObj || !bcrypt.compareSync(password, userObj.password)) {
+  const userObj = getUserByEmail(req.email, users);
+  if (!userObj || !bcrypt.compareSync(req.password, userObj.password)) {
     return res
       .status(403)
       .render("error", { user, error: "wrong ID/password combination" });
